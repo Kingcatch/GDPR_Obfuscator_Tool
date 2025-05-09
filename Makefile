@@ -1,5 +1,5 @@
 #################################################################################
-# Makefile to build the project using python -m venv (bootcamp-friendly version)
+# Makefile to build the project and run tests
 #################################################################################
 
 PROJECT_NAME = gdpr_obfuscator_tool
@@ -64,3 +64,24 @@ unit-test:
 
 ## Run all quality checks
 run-checks: security-test run-black unit-test
+
+################################################################################################################
+# Terraform Infrastructure
+
+terraform-format:
+	cd terraform && terraform fmt -recursive
+
+terraform-validate:
+	cd terraform && terraform validate
+
+terraform-init:
+	cd terraform && terraform init
+
+terraform-plan:
+	cd terraform && terraform plan
+
+terraform-apply:
+	cd terraform && terraform apply -auto-approve
+
+terraform-destroy:
+	cd terraform && terraform destroy -auto-approve
