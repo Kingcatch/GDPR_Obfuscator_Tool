@@ -44,16 +44,15 @@ Configure AWS Lambda:
 
 **How to Use the Tool**
 
-Project Structure
 The tool consists of the following main scripts:
 
-dispatcher.py: The main entry point that coordinates the invocation and processing of the data. It routes requests to the appropriate handler based on the file format (CSV, JSON, Parquet).
+- dispatcher.py: The main entry point that coordinates the invocation and processing of the data. It routes requests to the appropriate handler based on the file format (CSV, JSON, Parquet).
 
-csv_handler.py: Handles processing and obfuscation of CSV files.
+- csv_handler.py: Handles processing and obfuscation of CSV files.
 
-json_handler.py: Handles processing and obfuscation of JSON files.
+- json_handler.py: Handles processing and obfuscation of JSON files.
 
-parquet_handler.py: Handles processing and obfuscation of Parquet files.
+- parquet_handler.py: Handles processing and obfuscation of Parquet files.
 
 1. JSON Input Example
 The tool is invoked with a JSON string containing:
@@ -61,6 +60,8 @@ The tool is invoked with a JSON string containing:
 file_to_obfuscate: The S3 location of the file to process (e.g., s3://my-ingestion-bucket/data/file1.csv).
 
 pii_fields: A list of PII field names to be obfuscated (e.g., name, email_address).
+
+----------------------------------------------------------------------------------------------
 
 Example Input:
 json
@@ -70,27 +71,12 @@ Edit
   "file_to_obfuscate": "s3://my-ingestion-bucket/data/file1.csv",
   "pii_fields": ["name", "email_address"]
 }
+
+
 2. Supported File Formats
 CSV: The tool reads CSV files, processes the data, and obfuscates the specified PII fields using the csv_handler.py.
 
 JSON: The tool supports JSON format and obfuscates PII fields in JSON objects using the json_handler.py.
-
-
-
-Example Input Data (CSV):
-csv
-Copy
-Edit
-student_id,name,course,cohort,graduation_date,email_address
-1234,John Smith,Software,2024-03-31,j.smith@email.com
-5678,Jane Doe,Data Science,2024-06-15,jane.doe@email.com
-Example Output Data (Obfuscated):
-csv
-Copy
-Edit
-student_id,name,course,cohort,graduation_date,email_address
-1234,***,Software,2024-03-31,***
-5678,***,Data Science,2024-06-15,***
 
 
 3. How It Works
@@ -105,7 +91,7 @@ The obfuscated file is returned as a byte-stream and uploaded to the designated 
 4. Example Workflow
 Trigger: An AWS service (like EventBridge, Step Functions, or Lambda) triggers the tool with a JSON payload.
 
-Obfuscation: The tool reads the file from S3, obfuscates the specified fields, and generates the obfuscated file.
+Obfuscation: The tool reads the file from S3, routes the appropriate file specific processor, obfuscates the specified fields, and generates the obfuscated file.
 
 Storage: The obfuscated file is uploaded back to an S3 bucket.
 
@@ -118,6 +104,7 @@ Edit
   "message": "File obfuscated and uploaded to S3 successfully.",
   "output_file_location": "s3://my-output-bucket/obfuscated_file.csv"
 }
+
 5. Logging and Alerts
 CloudWatch Logs: All operations are logged to CloudWatch, providing insight into the execution of the tool.
 
