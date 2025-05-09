@@ -9,7 +9,7 @@ s3 = boto3.client('s3')
 def json_processor(bucket, file_name, pii_fields):
     print(f"JSON Handler called for file: {file_name} in bucket: {bucket}")
 
-    # Retrieve file from S3
+
     try:
         obj = s3.get_object(Bucket=bucket, Key=file_name)
     except ClientError as e:
@@ -17,7 +17,7 @@ def json_processor(bucket, file_name, pii_fields):
 
     content = obj['Body'].read().decode('utf-8').strip()
 
-    # Validate content presence
+
     if not content:
         raise ValueError(f"JSON file {file_name} is empty or unreadable.")
 
@@ -26,18 +26,18 @@ def json_processor(bucket, file_name, pii_fields):
     except json.JSONDecodeError:
         raise ValueError(f"JSON file {file_name} is not a valid JSON format.")
 
-    # Ensure data is a list of dicts
+
     if not isinstance(records, list) or not all(isinstance(record, dict) for record in records):
         raise ValueError(f"JSON file {file_name} must contain a list of JSON objects.")
 
     df = pd.DataFrame(records)
 
-    # Obfuscate PII fields
+
     for field in pii_fields:
         if field in df.columns:
             df[field] = df[field].apply(lambda x: '*' * len(str(x)) if pd.notna(x) else x)
 
-    # Convert back to JSON
+  
     obfuscated_data = df.to_dict(orient='records')
     obfuscated_json = json.dumps(obfuscated_data, indent=2).encode('utf-8')
 
@@ -53,7 +53,6 @@ def lambda_handler(event, context):
     pii_fields = event.get('pii_fields', [])
     print("PII Fields passed:", pii_fields)
 
-    # Parse S3 details
     if 'file_to_obfuscate' in event:
         s3_uri = event['file_to_obfuscate']
         no_prefix = s3_uri.replace('s3://', '')
